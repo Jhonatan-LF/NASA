@@ -1,5 +1,6 @@
 # 🚀 MARS-1: SPACE OUTPOST SIMULATOR
 > *"Every decision determines survival."*
+n**▶ Jugar ahora:** https://jhonatan-lf.github.io/NASA/
 
 Simulador táctico e interactivo de gestión y supervivencia en un puesto de avanzada espacial en **Marte** o la **Luna**, desarrollado para el **NASA Space Apps Challenge / Hackathon STEM (24 horas)**.
 
