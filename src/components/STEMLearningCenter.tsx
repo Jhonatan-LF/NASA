@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { STEM_KNOWLEDGE_CARDS, STEM_GLOSSARY, STEMCard } from '../engine/stemKnowledge';
 import { BookOpen, X, Search, Sparkles, Award, ExternalLink, HelpCircle } from 'lucide-react';
 import { soundService } from '../services/soundService';
+import { DATA_SOURCES, REAL_EVENTS, SPACE_WEATHER_CATALOG } from '../domain/sources';
 
 interface STEMLearningCenterProps {
   onClose: () => void;
@@ -12,7 +13,7 @@ export const STEMLearningCenter: React.FC<STEMLearningCenterProps> = ({
   onClose,
   initialCardId,
 }) => {
-  const [activeTab, setActiveTab] = useState<'cards' | 'glossary'>('cards');
+  const [activeTab, setActiveTab] = useState<'cards' | 'glossary' | 'sources'>('cards');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedCardId, setExpandedCardId] = useState<string | null>(initialCardId || null);
@@ -99,6 +100,16 @@ export const STEMLearningCenter: React.FC<STEMLearningCenterProps> = ({
               }`}
             >
               Glosario Aeroespacial ({STEM_GLOSSARY.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('sources')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                activeTab === 'sources'
+                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                  : 'bg-space-900 text-slate-400 hover:text-white border border-slate-700'
+              }`}
+            >
+              Fuentes NASA ({DATA_SOURCES.length + REAL_EVENTS.length})
             </button>
           </div>
 
@@ -208,6 +219,67 @@ export const STEMLearningCenter: React.FC<STEMLearningCenterProps> = ({
                 })}
               </div>
             </>
+          )}
+
+          {activeTab === 'sources' && (
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xs font-heading font-black uppercase tracking-wider text-amber-300 mb-2">
+                  Esto pasó de verdad
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {REAL_EVENTS.map((ev) => (
+                    <div key={ev.id} className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 space-y-1.5">
+                      <span className="text-[10px] font-mono text-amber-300">{ev.date}</span>
+                      <p className="text-xs font-heading font-black text-slate-100">{ev.title}</p>
+                      <p className="text-xs text-slate-300 leading-relaxed">{ev.whatHappened}</p>
+                      <p className="text-[11px] text-cyan-300 leading-relaxed">
+                        <strong>En el juego:</strong> {ev.inTheGame}
+                      </p>
+                      <a
+                        href={ev.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 underline"
+                      >
+                        <ExternalLink className="w-3 h-3" /> {ev.sourceName}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xs font-heading font-black uppercase tracking-wider text-emerald-300 mb-2">
+                  De dónde sale cada número
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {DATA_SOURCES.map((src) => (
+                    <div key={src.id} className="p-3.5 rounded-xl bg-space-950/70 border border-slate-800 space-y-1.5">
+                      <p className="text-xs font-heading font-black text-cyan-400">{src.gameValue}</p>
+                      <p className="text-xs text-slate-300 leading-relaxed">{src.fact}</p>
+                      <p className="text-[11px] text-slate-400 leading-relaxed">
+                        <strong>En el juego:</strong> {src.usedIn}
+                      </p>
+                      <a
+                        href={src.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 underline"
+                      >
+                        <ExternalLink className="w-3 h-3" /> {src.sourceName}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Cada tormenta solar queda registrada en el catálogo público{' '}
+                <a href={SPACE_WEATHER_CATALOG.url} target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline">
+                  {SPACE_WEATHER_CATALOG.name}
+                </a>
+                . Los valores del juego se simplificaron para jugar por turnos, pero parten de estas mediciones.
+              </p>
+            </div>
           )}
 
           {activeTab === 'glossary' && (

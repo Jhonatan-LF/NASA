@@ -103,7 +103,7 @@ export const STEM_GLOSSARY: STEMGlossaryTerm[] = [
   {
     term: 'MiliSievert (mSv)',
     definition: 'Unidad de dosis de radiación ionizante absorbida por el tejido biológico ponderada por el daño relativo. Una radiografía de tórax equivale a ~0.1 mSv.',
-    realContext: 'Los astronautas en espacio profundo reciben entre 1.5 y 2.0 mSv/día sin blindaje. El límite de carrera de la NASA está en torno a 600 mSv.',
+    realContext: 'Los astronautas en espacio profundo reciben entre 1.5 y 2.0 mSv/día sin blindaje. El límite de carrera de la NASA (estándar NASA-STD-3001, 2022) es de 600 mSv.',
   },
   {
     term: 'Regolito',

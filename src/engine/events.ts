@@ -12,7 +12,7 @@ export const GAME_EVENTS_DECK: GameEvent[] = [
     triggerMinCycle: 2,
     iconName: 'Wind',
     stemExplanation:
-      'En Marte, el polvo electrostático en suspensión puede persistir por meses debido a la baja gravedad y la ausencia de lluvia. Misiones reales como el rover Opportunity y el módulo InSight finalizaron debido a la acumulación de polvo en sus paneles fotovoltaicos.',
+      'HECHO REAL: en junio de 2018 una tormenta de polvo cubrió todo Marte y tapó el Sol. El rover Opportunity, que funcionaba con paneles solares, envió su última señal el 10 de junio de 2018 y nunca volvió a responder, después de casi 15 años de trabajo. En Marte no llueve, así que el polvo puede quedar flotando durante semanas. (Fuente: NASA Science, misión Opportunity.)',
     choices: [
       {
         id: 'opt_dust_generators',
@@ -57,7 +57,7 @@ export const GAME_EVENTS_DECK: GameEvent[] = [
     triggerMinCycle: 3,
     iconName: 'SunAlert',
     stemExplanation:
-      'Sin una magnetosfera protectora como la terrestre (Cinturones de Van Allen), los protones relativistas atraviesan cascos de naves espaciales y generan dosis ionizantes agudas capaces de inducir el síndrome de radiación aguda (ARS).',
+      'HECHO REAL: el 20 de mayo de 2024 una fulguración solar de clase X12 alcanzó Marte. El instrumento RAD del rover Curiosity midió 8.100 micrograys, lo mismo que 30 radiografías de tórax de una sola vez: la mayor dosis desde que aterrizó en 2012. Ni la Luna ni Marte tienen un campo magnético global que desvíe esas partículas, así que la única defensa es un refugio blindado. (Fuente: NASA, "NASA Watches Mars Light Up During Epic Solar Storm".)',
     choices: [
       {
         id: 'opt_solar_shelter',

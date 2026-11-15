@@ -1,6 +1,8 @@
 # 🚀 MARS-1: SPACE OUTPOST SIMULATOR
 > *"Every decision determines survival."*
 
+**▶ Jugar ahora:** https://jhonatan-lf.github.io/NASA/
+
 Simulador táctico e interactivo de gestión y supervivencia en un puesto de avanzada espacial en **Marte** o la **Luna**, desarrollado para el **NASA Space Apps Challenge / Hackathon STEM (24 horas)**.
 
 Permite a estudiantes, jueces y entusiastas del espacio experimentar en carne propia los dilemas, equilibrios termodinámicos y decisiones críticas de ingeniería aeroespacial que afrontan los directores de vuelo de la NASA y los comandantes de misiones extraterrestres.
@@ -23,7 +25,7 @@ El proyecto fue diseñado siguiendo los estándares de **Senior Software Enginee
 src/
 ├── domain/                      # Capa de Dominio (Modelos puros y constantes STEM)
 │   ├── types.ts                 # Tipos estrictos (GameState, ColonyFacilities, SubResources, Policies)
-│   └── constants.ts             # Constantes aeroespaciales NASA ECLSS, irradiancia, radiación NCRP
+│   └── constants.ts             # Constantes aeroespaciales NASA ECLSS, irradiancia, radiación NASA-STD-3001
 ├── engine/                      # Capa de Negocio / Simulación Pura
 │   ├── simulationEngine.ts      # Motor matemático de simulación por ciclo (Sol)
 │   ├── simulationEngine.test.ts # Pruebas unitarias automatizadas con Vitest (9/9 tests passed)

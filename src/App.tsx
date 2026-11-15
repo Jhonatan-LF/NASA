@@ -71,6 +71,7 @@ export interface CommanderSetup {
 }
 
 const COUNTRIES = [
+  { flag: '🇧🇴', name: 'Bolivia' },
   { flag: '🇦🇷', name: 'Argentina' },
   { flag: '🇲🇽', name: 'México' },
   { flag: '🇪🇸', name: 'España' },
@@ -82,11 +83,11 @@ const COUNTRIES = [
 ];
 
 const RANDOM_NAMES = [
-  'Cmdr. Leo Messi-Vega',
-  'Dra. Valentina Tereshkova',
-  'Cap. Franco Colapinto',
+  'Cmdr. Lucía Vega',
+  'Dra. Valentina Suárez',
+  'Cap. Franco Quiroga',
   'Ing. Sofía Hernández',
-  'Cmdr. Marcos Pontes',
+  'Cmdr. Marcos Peña',
   'Dra. Elena Vance',
   'Cap. Mateo Rossi',
 ];
@@ -377,7 +378,7 @@ export function App() {
     };
   }, [gameState]);
 
-  // Calculate Copero / FIFA style OVR (Overall Rating 0-99) of the Colony
+  // Calculate OVR (Overall Rating 0-99) of the Colony
   const colonyOVR = useMemo(() => {
     const energyPct = Math.round(
       (gameState.subResources.batteryStorageCurrent /
@@ -829,10 +830,10 @@ export function App() {
             </div>
             <div>
               <span className="font-heading font-black tracking-wider text-sm text-white block leading-none">
-                MARS-1 <span className="text-cyan-400">COPERO EDITION</span>
+                MARS-1 <span className="text-cyan-400">PUESTO DE AVANZADA</span>
               </span>
               <span className="text-[10px] font-mono text-slate-400">
-                Simulador de Carrera Espacial • NASA ECLSS
+                Simulador de misión espacial • Datos de la NASA
               </span>
             </div>
           </div>
@@ -1053,7 +1054,7 @@ export function App() {
         </main>
 
         <footer className="text-center text-[11px] font-mono text-slate-500 pt-2">
-          Inspirado en la jugabilidad intuitiva de Copero • Datos científicos reales de la NASA
+          Cada número del juego sale de datos públicos de la NASA • Míralos en el Centro STEM, pestaña Fuentes
         </footer>
 
         {showHowToPlay && <HowToPlayModal onClose={() => setShowHowToPlay(false)} />}
@@ -1079,7 +1080,7 @@ export function App() {
     return (
       <div className="min-h-screen bg-[#070b16] text-slate-100 flex flex-col justify-center items-center p-4">
         <div className="w-full max-w-lg bg-gradient-to-b from-[#111c38] to-[#0a1022] border-2 border-amber-400/70 rounded-3xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95">
-          {/* Top FIFA / Copero Style Legend Header */}
+          {/* Legend Header */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-700 text-space-950 flex flex-col items-center justify-center font-heading font-black shadow-lg shadow-amber-500/30">
@@ -1335,7 +1336,7 @@ export function App() {
         <div className="max-w-3xl mx-auto space-y-2.5">
           {/* Top Row: Commander Card + Sol Progress + Utility Buttons */}
           <div className="flex flex-wrap items-center justify-between gap-2">
-            {/* Commander & OVR Badge (Like Copero FIFA Rating) */}
+            {/* Commander & OVR Badge (rating general) */}
             <div className="flex items-center gap-2.5">
               <div
                 className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center font-heading font-black border shadow-md ${
