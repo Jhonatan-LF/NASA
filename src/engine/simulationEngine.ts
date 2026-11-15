@@ -8,6 +8,19 @@ import {
 } from '../domain/types';
 import { NASA_ECLSS_METRICS } from '../domain/constants';
 
+// Parámetros de dificultad (ajustados con miles de partidas simuladas)
+const BLACKOUT_ECLSS_FACTOR = 0.3;
+const SHIELD_WEAK = 0.5;
+const SHIELD_CRITICAL = 0.25;
+const SHIELD_EROSION_MARS = 5;
+const SHIELD_EROSION_MOON = 7;
+const SHIELD_REPAIR_FULL_SHIELD = 4;
+const HEALTH_LOSS_SHIELD_WEAK = 8;
+const HEALTH_LOSS_SHIELD_CRITICAL = 18;
+const HEALTH_LOSS_BLACKOUT = 10;
+const HEALTH_LOSS_HUNGER = 10;
+const HEALTH_LOSS_STARVATION = 20;
+
 export interface SimulationStepResult {
   nextState: GameState;
   telemetry: CycleTelemetryRecord;
@@ -81,26 +94,32 @@ export function advanceSimulationCycle(currentState: GameState): SimulationStepR
     warnings.push('¡ALERTA CRÍTICA: Baterías agotadas! Los sistemas auxiliares operan en fallo por apagón.');
   }
 
+  // Sin energía no hay soporte vital: en apagón el ECLSS trabaja al 30% (reserva química)
+  // y las lámparas del invernadero se apagan, así que no produce ni oxígeno ni comida.
+  const blackout = newBattery <= 0;
+  const eclssPowerFactor = blackout ? BLACKOUT_ECLSS_FACTOR : 1.0;
+  const greenhousePowerFactor = blackout ? 0.0 : 1.0;
+
   // 4. Life Support (ECLSS) Calculations
   // Oxygen:
   const o2CrewConsumption = crewCount * NASA_ECLSS_METRICS.OXYGEN_KG_PER_CREW_DAY;
   // Greenhouse produces O2 via photosynthesis (level * health * productionBonus)
-  const o2GreenhouseGen = 1.2 * current.facilities.greenhouse.level * (current.facilities.greenhouse.health / 100) * productionBonus;
+  const o2GreenhouseGen = 1.2 * current.facilities.greenhouse.level * (current.facilities.greenhouse.health / 100) * productionBonus * greenhousePowerFactor;
   // Sabatier / Electrolysis efficiency
-  const o2EclssRecycled = o2CrewConsumption * 0.70 * (current.facilities.lifeSupport.health / 100) * lifeSupportPriorityMultiplier;
+  const o2EclssRecycled = o2CrewConsumption * 0.70 * (current.facilities.lifeSupport.health / 100) * lifeSupportPriorityMultiplier * eclssPowerFactor;
   const netO2Change = (o2GreenhouseGen + o2EclssRecycled) - o2CrewConsumption;
   let newOxygen = Math.max(0, Math.min(current.subResources.oxygenMax, current.subResources.oxygenCurrent + netO2Change));
 
   // Water:
   const waterCrewConsumption = crewCount * NASA_ECLSS_METRICS.WATER_L_PER_CREW_DAY;
-  const waterRecycled = waterCrewConsumption * current.subResources.waterRecyclingEfficiency * (current.facilities.lifeSupport.health / 100);
+  const waterRecycled = waterCrewConsumption * current.subResources.waterRecyclingEfficiency * (current.facilities.lifeSupport.health / 100) * eclssPowerFactor;
   const waterGreenhouseUse = (current.facilities.greenhouse.health > 20 ? 4.0 : 1.0) * (current.policy === 'PRODUCTION' ? 1.4 : 1.0);
   const netWaterChange = waterRecycled - (waterCrewConsumption + waterGreenhouseUse);
   let newWater = Math.max(0, Math.min(current.subResources.waterMax, current.subResources.waterCurrent + netWaterChange));
 
   // Food:
   const foodCrewConsumption = crewCount * NASA_ECLSS_METRICS.FOOD_KG_PER_CREW_DAY;
-  const foodGreenhouseProduction = 1.8 * current.facilities.greenhouse.level * (current.facilities.greenhouse.health / 100) * productionBonus;
+  const foodGreenhouseProduction = 1.8 * current.facilities.greenhouse.level * (current.facilities.greenhouse.health / 100) * productionBonus * greenhousePowerFactor;
   const netFoodChange = foodGreenhouseProduction - foodCrewConsumption;
   let newFood = Math.max(0, Math.min(current.subResources.foodMax, current.subResources.foodCurrent + netFoodChange));
 
@@ -110,7 +129,12 @@ export function advanceSimulationCycle(currentState: GameState): SimulationStepR
     : NASA_ECLSS_METRICS.BACKGROUND_MOON_MSV_PER_CYCLE;
 
   const effectiveShield = Math.min(1.0, (current.subResources.shieldIntegrity / 100) + radiationShieldBonus);
-  const attenuatedMsv = Math.max(0.05, backgroundMsv * (1.0 - (effectiveShield * 0.88)));
+  // Con el blindaje degradado, las partículas solares llegan al hábitat y la dosis se multiplica.
+  const shieldBreachMultiplier = effectiveShield < SHIELD_CRITICAL ? 12 : effectiveShield < SHIELD_WEAK ? 5 : 1;
+  const attenuatedMsv = Math.max(0.05, backgroundMsv * (1.0 - (effectiveShield * 0.88)) * shieldBreachMultiplier);
+  if (effectiveShield < SHIELD_WEAK) {
+    warnings.push('¡ALERTA DE RADIACIÓN! El blindaje está por debajo del 50%: la tripulación recibe dosis peligrosas.');
+  }
   const accumulatedRadiation = current.subResources.radiationExposureAccumulated + attenuatedMsv;
 
   // 6. Facility Wear & Tear
@@ -160,19 +184,25 @@ export function advanceSimulationCycle(currentState: GameState): SimulationStepR
     if (newWater <= 10) healthDelta -= 25;
 
     // Lack of food causes starvation & morale drop
-    if (newFood <= 10) {
-      healthDelta -= 8;
+    if (newFood <= 0) {
+      healthDelta -= HEALTH_LOSS_STARVATION;
+      moraleDelta -= 30;
+    } else if (newFood <= 10) {
+      healthDelta -= HEALTH_LOSS_HUNGER;
       moraleDelta -= 20;
     }
 
     // High radiation penalties
+    // Blindaje degradado: exposición aguda a partículas solares
+    if (effectiveShield < SHIELD_CRITICAL) healthDelta -= HEALTH_LOSS_SHIELD_CRITICAL;
+    else if (effectiveShield < SHIELD_WEAK) healthDelta -= HEALTH_LOSS_SHIELD_WEAK;
     if (accumulatedRadiation > 25) healthDelta -= 5;
     if (accumulatedRadiation > 50) healthDelta -= 15;
 
     // Blackout penalty
     if (newBattery <= 0) {
       moraleDelta -= 15;
-      healthDelta -= 5;
+      healthDelta -= HEALTH_LOSS_BLACKOUT; // sin calefacción ni depuración de CO2
     }
 
     // Positive recovery if resources are abundant and health < 100
@@ -199,11 +229,16 @@ export function advanceSimulationCycle(currentState: GameState): SimulationStepR
 
   // 8. Shield Integrity slight regeneration or decay
   let newShieldIntegrity = current.subResources.shieldIntegrity;
-  if (current.facilities.radiationShield.health > 70) {
-    newShieldIntegrity = Math.min(100, newShieldIntegrity + 1);
-  } else if (current.facilities.radiationShield.health < 40) {
-    newShieldIntegrity = Math.max(10, newShieldIntegrity - 3);
+  // El blindaje se erosiona cada sol (micrometeoritos, ciclos térmicos, polvo abrasivo).
+  // Solo el Modo Blindaje dedica energía y tripulación a reponerlo.
+  if (current.policy === 'FULL_SHIELD') {
+    newShieldIntegrity += SHIELD_REPAIR_FULL_SHIELD;
+  } else {
+    newShieldIntegrity -= current.planet.id === 'moon' ? SHIELD_EROSION_MOON : SHIELD_EROSION_MARS;
+    if (current.policy === 'PRODUCTION') newShieldIntegrity -= 1;
+    if (current.facilities.radiationShield.health < 40) newShieldIntegrity -= 3;
   }
+  newShieldIntegrity = Math.max(0, Math.min(100, newShieldIntegrity));
 
   // 9. Aggregate Indexes
   const energyPercent = Math.round((newBattery / current.subResources.batteryStorageMax) * 100);
@@ -220,7 +255,65 @@ export function advanceSimulationCycle(currentState: GameState): SimulationStepR
 
   const aliveCrew = updatedCrew.filter((c) => c.health > 0);
 
-  if (aliveCrew.length === 0) {
+  const hadCrewBefore = current.crew.some((c) => c.health > 0);
+  if (aliveCrew.length === 0 && hadCrewBefore && effectiveShield < SHIELD_WEAK) {
+    nextStatus = 'defeat';
+    defeatCause = {
+      title: 'SÍNDROME DE RADIACIÓN AGUDA: BLINDAJE COLAPSADO',
+      reason: 'El escudo de regolito se degradó y las partículas solares atravesaron el hábitat casi sin atenuación.',
+      criticalMetric: `Blindaje: ${Math.round(current.subResources.shieldIntegrity)}% · Dosis acumulada: ${Math.round(accumulatedRadiation * 10) / 10} mSv`,
+      sequenceOfEvents: [
+        'El blindaje se erosionó sol tras sol sin reparación.',
+        'Por debajo del 50% de integridad, la dosis diaria se multiplicó.',
+        'La tripulación sufrió exposición aguda sin un refugio operativo.',
+      ],
+      stemExplanation:
+        'Ni la Luna ni Marte tienen un campo magnético global que desvíe las partículas solares. El instrumento RAD del rover Curiosity midió unos 0,67 mSv por día en la superficie de Marte, y durante una tormenta solar la dosis puede multiplicarse en horas. Por eso los diseños de la NASA cubren los hábitats con regolito o agua.',
+      recommendations: [
+        'Usa el MODO BLINDAJE unos soles cuando el escudo baje del 60%.',
+        'Invierte en el refugio de regolito sinterizado antes de que llegue una tormenta solar.',
+        'En la Luna el escudo se desgasta más rápido: vigílalo desde el Sol 1.',
+      ],
+    };
+  } else if (aliveCrew.length === 0 && hadCrewBefore && newFood <= 10) {
+    nextStatus = 'defeat';
+    defeatCause = {
+      title: 'INANICIÓN: EL INVERNADERO NO ALCANZÓ',
+      reason: 'Las raciones se agotaron y la cosecha del invernadero no cubrió el consumo de la tripulación.',
+      criticalMetric: `Comida: ${Math.round(newFood * 10) / 10} kg`,
+      sequenceOfEvents: [
+        'El consumo diario superó a la cosecha durante demasiados soles.',
+        'Las raciones cayeron por debajo de la reserva mínima.',
+        'La desnutrición debilitó a la tripulación hasta el colapso.',
+      ],
+      stemExplanation:
+        'Cada astronauta necesita unos 0,62 kg de alimento seco por día. Reabastecer Marte desde la Tierra tarda meses, así que una base real depende de cultivar su comida. Las lámparas del invernadero consumen mucha energía: ahí está el dilema.',
+      recommendations: [
+        'Activa el MODO COSECHA antes de que la comida baje de 30 kg, no después.',
+        'Amplía el invernadero temprano: tarda en rendir.',
+        'Cuida la batería: en apagón el invernadero no produce nada.',
+      ],
+    };
+  } else if (aliveCrew.length === 0 && hadCrewBefore && blackout) {
+    nextStatus = 'defeat';
+    defeatCause = {
+      title: 'APAGÓN TOTAL: LA BASE SE QUEDÓ SIN ENERGÍA',
+      reason: 'Las baterías llegaron a cero y el soporte vital dejó de funcionar.',
+      criticalMetric: 'Batería: 0 kWh',
+      sequenceOfEvents: [
+        'El consumo superó a la generación solar durante varios soles.',
+        'Con la batería en cero, el ECLSS cayó al 30% y el invernadero se apagó.',
+        'Sin calefacción ni depuración de CO2, la tripulación no resistió.',
+      ],
+      stemExplanation:
+        'En una base espacial la energía es la raíz de todo: el oxígeno, el agua reciclada, la comida y la calefacción dependen de ella. En 2018 una tormenta de polvo global tapó el Sol en Marte y el rover Opportunity, que funcionaba con paneles solares, se quedó sin energía y nunca volvió a responder.',
+      recommendations: [
+        'Vuelve al MODO AHORRO cuando la batería baje del 25%.',
+        'Limpia los paneles solares y considera el generador de respaldo.',
+        'No uses el MODO COSECHA ni el MODO BLINDAJE muchos soles seguidos.',
+      ],
+    };
+  } else if (aliveCrew.length === 0) {
     nextStatus = 'defeat';
     defeatCause = {
       title: 'FALLO CATASTRÓFICO: PÉRDIDA TOTAL DE LA TRIPULACIÓN',

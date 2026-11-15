@@ -23,7 +23,7 @@ El proyecto fue diseñado siguiendo los estándares de **Senior Software Enginee
 src/
 ├── domain/                      # Capa de Dominio (Modelos puros y constantes STEM)
 │   ├── types.ts                 # Tipos estrictos (GameState, ColonyFacilities, SubResources, Policies)
-│   └── constants.ts             # Constantes aeroespaciales NASA ECLSS, irradiancia, radiación NCRP
+│   └── constants.ts             # Constantes aeroespaciales NASA ECLSS, irradiancia, radiación NASA-STD-3001
 ├── engine/                      # Capa de Negocio / Simulación Pura
 │   ├── simulationEngine.ts      # Motor matemático de simulación por ciclo (Sol)
 │   ├── simulationEngine.test.ts # Pruebas unitarias automatizadas con Vitest (9/9 tests passed)

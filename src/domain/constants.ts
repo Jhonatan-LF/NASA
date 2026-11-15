@@ -15,7 +15,7 @@ export const NASA_ECLSS_METRICS = {
   STANDARD_HABITAT_PRESSURE_KPA: 101.3,
   SAFE_MINIMUM_OXYGEN_KPA: 19.5,
 
-  // Radiation guidelines (NCRP Report No. 153 for astronauts)
+  // Límite de carrera: NASA-STD-3001 Vol. 1 (actualizado en 2022), 600 mSv para todos los astronautas
   MAX_CAREER_RADIATION_MSV: 600,
   LETHAL_ACUTE_RADIATION_MSV: 1000,
   SOLAR_STORM_FLUX_SPIKE_MSV: 120, // Coronal Mass Ejection unshielded
@@ -119,7 +119,7 @@ export const PLANET_SCENARIOS: Record<'mars' | 'moon', PlanetScenario> = {
   mars: {
     id: 'mars',
     name: 'Marte — Cráter Jezero',
-    subtitle: 'Ambiente hiperbárico hostil con tormentas periódicas de polvo fino.',
+    subtitle: 'Atmósfera casi inexistente (0,6% de la presión terrestre) y tormentas de polvo que tapan el Sol.',
     gravity: 3.72,
     dayNightCycleDays: 1.02, // 1 sol = 24h 39m
     solarIrradianceBase: 590, // W/m^2 en la superficie
@@ -127,13 +127,13 @@ export const PLANET_SCENARIOS: Record<'mars' | 'moon', PlanetScenario> = {
     dustStormRisk: true,
     extremeThermalSwings: false,
     description:
-      'Marte posee una atmósfera tenue de CO2 (0.6% de la terrestre) y abundante regolito rico en percloratos. El mayor reto logístico radica en las tormentas estacionales de polvo que reducen drásticamente la irradiancia solar y desgastan las juntas mecánicas.',
+      'Marte posee una atmósfera tenue de CO2 (0.6% de la terrestre) y abundante regolito rico en percloratos. El mayor reto logístico radica en las tormentas estacionales de polvo que reducen drásticamente la irradiancia solar y desgastan las juntas mecánicas. La nave de reabastecimiento se retrasó 15 soles: arrancas con las reservas justas.',
     initialResources: {
-      oxygen: 85, // kg
-      water: 240, // Litros
-      food: 180, // Raciones / kg
-      battery: 450, // kWh
-      credits: 2200, // k$
+      oxygen: 28, // kg
+      water: 50, // Litros
+      food: 14, // kg
+      battery: 145, // kWh
+      credits: 650, // k$
     },
     stemFocus: 'Utilización de recursos in-situ (ISRU), reacción Sabatier y mitigación de polvo electrostático.',
   },
@@ -148,13 +148,13 @@ export const PLANET_SCENARIOS: Record<'mars' | 'moon', PlanetScenario> = {
     dustStormRisk: false,
     extremeThermalSwings: true,
     description:
-      'Sin atmósfera ni magnetosfera, la Luna está directamente expuesta a rayos cósmicos galácticos (GCR) y micro-meteoritos continuos. Los picos del borde del cráter ofrecen luz solar casi constante, pero los contrastes térmicos van de +120°C a -130°C.',
+      'Sin atmósfera ni magnetosfera, la Luna está directamente expuesta a rayos cósmicos galácticos (GCR) y micro-meteoritos continuos. Los picos del borde del cráter ofrecen luz solar casi constante, pero los contrastes térmicos van de +120°C a -130°C. La nave de reabastecimiento se retrasó 15 soles: arrancas con las reservas justas y el escudo se desgasta más rápido que en Marte.',
     initialResources: {
-      oxygen: 90,
-      water: 210,
-      food: 190,
-      battery: 550,
-      credits: 2500,
+      oxygen: 27,
+      water: 44,
+      food: 14,
+      battery: 150,
+      credits: 650,
     },
     stemFocus: 'Blindaje térmico criogénico, protección por regolito sinterizado y gestión de energía en oscuridad.',
   },
