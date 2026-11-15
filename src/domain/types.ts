@@ -205,5 +205,22 @@ export interface GameState {
   defeatCause: DefeatCause | null;
   victorySummary: VictorySummary | null;
   stemDiscoveriesUnlocked: string[];
+  commanderProfile?: {
+    name: string;
+    countryFlag: string;
+    countryName: string;
+    specialtyId: 'energy' | 'biotech' | 'commander';
+    specialtyName: string;
+  };
+  lastSolSummary?: {
+    sol: number;
+    batteryDelta: number;
+    oxygenDelta: number;
+    waterDelta: number;
+    foodDelta: number;
+    shieldDelta: number;
+    creditsDelta: number;
+    headline: string;
+  } | null;
 }
 

@@ -314,7 +314,7 @@ export const GAME_EVENTS_DECK: GameEvent[] = [
         text: 'Desplegar Rover de Carga para Recuperar Contenedores',
         costCredits: 60,
         energyCost: 20,
-        description: 'Recupera raciones de comida fresca liofilizada, filtros de agua y 400 k$ en subvenciones de investigación.',
+        description: 'Recupera raciones de comida fresca liofilizada, filtros de agua y 350 k$ en subvenciones de investigación.',
         consequences: {
           waterDelta: 40,
           foodDelta: 50,
@@ -326,7 +326,235 @@ export const GAME_EVENTS_DECK: GameEvent[] = [
         stemLesson:
           'El soporte logístico automatizado complementa la autosuficiencia local durante las fases iniciales de colonización.',
       },
+      {
+        id: 'opt_recycle_lander_parts',
+        text: 'Desmantelar Cápsula para Extraer Baterías y Titanio',
+        costCredits: 0,
+        energyCost: 10,
+        description: 'Aprovecha las celdas de energía y el blindaje de la cápsula para reforzar la base sin gastar presupuesto.',
+        consequences: {
+          batteryDelta: 95,
+          shieldDelta: 8,
+          creditsDelta: 120,
+          crewMoraleDelta: 10,
+          customMessage: 'Las celdas de combustible de la cápsula recargaron los bancos de baterías de la base.',
+        },
+        stemLesson:
+          'En ingeniería espacial, reutilizar las etapas de descenso como blindaje o almacén reduce la masa total lanzada desde la Tierra.',
+      },
+    ],
+  },
+  {
+    id: 'sol1_initial_deployment',
+    title: 'Aterrizaje Completado: Primer Día en la Base',
+    severity: 'positiva',
+    type: 'opportunity',
+    description:
+      'Los sistemas principales acaban de encenderse tras el aterrizaje. Control de Misión en Houston pregunta cuál será tu prioridad inicial para arrancar la temporada en el puesto de avanzada.',
+    applicablePlanets: ['mars', 'moon'],
+    triggerMinCycle: 1,
+    iconName: 'Rocket',
+    stemExplanation:
+      'Las primeras 24 horas tras el aterrizaje (Post-Landing Checkouts) definen la estabilidad del soporte vital (ECLSS) y la calibración de los paneles solares.',
+    choices: [
+      {
+        id: 'opt_sol1_solar_boost',
+        text: 'Calibrar Paneles Solares al Máximo',
+        costCredits: 0,
+        description: 'Alinea los paneles fotovoltaicos con el ángulo solar óptimo para asegurar reserva de batería desde el inicio.',
+        consequences: {
+          batteryDelta: 75,
+          crewMoraleDelta: 5,
+          customMessage: '¡Paneles alineados! Las baterías recibieron una carga extra de +75 kWh.',
+        },
+        stemLesson:
+          'El seguimiento solar en dos ejes maximiza el coseno del ángulo de incidencia, aumentando hasta un 35% la captación de energía.',
+      },
+      {
+        id: 'opt_sol1_water_reserve',
+        text: 'Sintetizar Reserva Extra de Agua y Oxígeno',
+        costCredits: 0,
+        description: 'Activa los tanques químicos iniciales para llenar las reservas de agua potable y aire respirable.',
+        consequences: {
+          waterDelta: 45,
+          oxygenDelta: 12,
+          crewMoraleDelta: 5,
+          customMessage: '¡Soporte vital reforzado! +45L de agua y +12kg de oxígeno añadidos a las reservas.',
+        },
+        stemLesson:
+          'Contar con un colchón de agua y oxígeno (Buffer Stock) protege a la tripulación frente a fluctuaciones en el reciclador.',
+      },
+      {
+        id: 'opt_sol1_nasa_grant',
+        text: 'Transmitir Telemetría en Vivo a la Tierra',
+        costCredits: 0,
+        description: 'Envía el primer reporte audiovisual de alta definición para asegurar fondos extra del Congreso.',
+        consequences: {
+          creditsDelta: 300,
+          crewMoraleDelta: 10,
+          customMessage: '¡Transmisión histórica! Recibiste +$300k adicionales en presupuesto de misión.',
+        },
+        stemLesson:
+          'Las comunicaciones por banda Ka y óptica láser permiten transmitir datos científicos de alta velocidad desde la Luna y Marte.',
+      },
+    ],
+  },
+  {
+    id: 'earth_university_contract',
+    title: 'Contrato de Investigación con Universidades de la Tierra',
+    severity: 'positiva',
+    type: 'opportunity',
+    description:
+      'Un consorcio internacional ofrece financiar tu base si realizas pruebas de cultivo en baja gravedad o análisis de radiación durante este Sol.',
+    applicablePlanets: ['mars', 'moon'],
+    triggerMinCycle: 2,
+    iconName: 'Award',
+    stemExplanation:
+      'La ciencia financiada mediante alianzas público-privadas permite costear repuestos críticos mientras se genera conocimiento aplicable en la Tierra.',
+    choices: [
+      {
+        id: 'opt_contract_accept',
+        text: 'Aceptar el Experimento (Usar Energía del Laboratorio)',
+        costCredits: 0,
+        energyCost: 35,
+        description: 'Dedica energía de las baterías para completar el estudio y cobrar la recompensa económica completa.',
+        consequences: {
+          batteryDelta: -35,
+          creditsDelta: 420,
+          crewMoraleDelta: 8,
+          customMessage: '¡Experimento exitoso! La base recibió +$420k en fondos de patrocinio científico.',
+        },
+        stemLesson:
+          'Los laboratorios orbitales y planetarios monetizan el entorno de microgravedad o baja gravedad para biotecnología.',
+      },
+      {
+        id: 'opt_contract_botany',
+        text: 'Enfocar el Estudio en Duplicar Raciones de Comida',
+        costCredits: 50,
+        description: 'Aprovecha los reactivos del consorcio para acelerar los cultivos del invernadero local.',
+        consequences: {
+          creditsDelta: -50,
+          foodDelta: 45,
+          oxygenDelta: 10,
+          crewMoraleDelta: 10,
+          customMessage: 'Los nutrientes experimentales produjeron +45 kg de comida fresca y +10 kg de oxígeno.',
+        },
+        stemLesson:
+          'El uso de bacterias fijadoras de nitrógeno en regolito tratado multiplica el rendimiento agrícola espacial.',
+      },
+    ],
+  },
+  {
+    id: 'crew_fatigue_dilemma',
+    title: 'Sobrecarga de Turnos y Fatiga de la Tripulación',
+    severity: 'media',
+    type: 'malfunction',
+    description:
+      'El aislamiento espacial y el ruido constante de las bombas de aire están afectando el sueño de los 4 astronautas. El médico recomienda intervenir.',
+    applicablePlanets: ['mars', 'moon'],
+    triggerMinCycle: 3,
+    iconName: 'HeartPulse',
+    stemExplanation:
+      'En el espacio, la alteración del ritmo circadiano disminuye la atención cognitiva y aumenta la probabilidad de errores humanos.',
+    choices: [
+      {
+        id: 'opt_crew_rest_day',
+        text: 'Declarar Jornada Recreativa y Banquete Especial',
+        costCredits: 80,
+        description: 'Sirve raciones gourmet e ilumina el hábitat con luz cálida para recuperar salud y moral al instante.',
+        consequences: {
+          creditsDelta: -80,
+          foodDelta: -10,
+          crewHealthDelta: 18,
+          crewMoraleDelta: 25,
+          customMessage: '¡La tripulación recuperó energías! +18% de salud y +25% de moral en todo el equipo.',
+        },
+        stemLesson:
+          'La psicología espacial de la NASA incluye comidas especiales y contacto familiar para mitigar el síndrome del tercer cuarto de misión.',
+      },
+      {
+        id: 'opt_crew_double_shift',
+        text: 'Mantener Turnos Dobles para Recargar Recursos',
+        costCredits: 0,
+        description: 'Exige un esfuerzo extra a la tripulación para producir más agua, oxígeno y energía hoy.',
+        consequences: {
+          batteryDelta: 55,
+          waterDelta: 30,
+          oxygenDelta: 12,
+          crewMoraleDelta: -12,
+          crewHealthDelta: -5,
+          customMessage: 'Se logró un superávit de +55 kWh y +30L de agua, aunque los astronautas terminaron agotados.',
+        },
+        stemLesson:
+          'En situaciones límite, priorizar las reservas físicas del hábitat garantiza la supervivencia a largo plazo.',
+      },
+    ],
+  },
+  {
+    id: 'water_condenser_boost',
+    title: 'Condensación Atmosférica en el Invernadero',
+    severity: 'baja',
+    type: 'opportunity',
+    description:
+      'La transpiración de las plantas en el invernadero ha generado una alta humedad relativa. Puedes recolectarla para los tanques de agua o usarla para refrigerar los reactores.',
+    applicablePlanets: ['mars', 'moon'],
+    triggerMinCycle: 2,
+    iconName: 'Droplets',
+    stemExplanation:
+      'Las plantas transpiran hasta el 97% del agua que absorben. En un circuito cerrado, los deshumidificadores recuperan ese vapor como agua destilada pura.',
+    choices: [
+      {
+        id: 'opt_harvest_humidity',
+        text: 'Condensar Vapor hacia los Tanques de Agua Potable',
+        costCredits: 0,
+        description: 'Recupera cada gota de humedad ambiental para aumentar gratuitamente tus reservas de agua.',
+        consequences: {
+          waterDelta: 55,
+          crewMoraleDelta: 5,
+          customMessage: '¡Agua pura recolectada! Tus tanques sumaron +55 Litros sin costo.',
+        },
+        stemLesson:
+          'El sistema de recuperación de condensado de la ISS es una de las fuentes más limpias de agua en órbita.',
+      },
+      {
+        id: 'opt_cool_solar_inverters',
+        text: 'Usar el Agua en el Circuito de Refrigeración Eléctrica',
+        costCredits: 0,
+        description: 'Enfría las baterías y paneles para obtener una descarga extra de energía y proteger los módulos.',
+        consequences: {
+          batteryDelta: 65,
+          shieldDelta: 6,
+          facilityWearDelta: { solarArray: 12, lifeSupport: 10 },
+          customMessage: '¡Sistemas refrigerados! Ganaste +65 kWh de batería y reparaste módulos clave.',
+        },
+        stemLesson:
+          'El control térmico activo mediante intercambiadores de calor de agua evita el sobrecalentamiento de la electrónica de potencia.',
+      },
     ],
   },
 ];
+
+export function pickNextCycleEvent(
+  cycle: number,
+  planetId: 'mars' | 'moon',
+  recentEventIds: string[]
+): GameEvent {
+  if (cycle === 1) {
+    const sol1 = GAME_EVENTS_DECK.find((e) => e.id === 'sol1_initial_deployment');
+    if (sol1) return sol1;
+  }
+
+  const eligible = GAME_EVENTS_DECK.filter((ev) => {
+    if (ev.id === 'sol1_initial_deployment') return false;
+    if (ev.applicablePlanets && !ev.applicablePlanets.includes(planetId)) return false;
+    if (ev.triggerMinCycle && cycle < ev.triggerMinCycle) return false;
+    return true;
+  });
+
+  const notRecent = eligible.filter((ev) => !recentEventIds.includes(ev.id));
+  const pool = notRecent.length > 0 ? notRecent : eligible;
+  const randomIndex = Math.floor(Math.random() * pool.length);
+  return pool[randomIndex] || GAME_EVENTS_DECK[0];
+}
+
 
